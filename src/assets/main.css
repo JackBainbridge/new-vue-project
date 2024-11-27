@@ -1,0 +1,56 @@
+:root {
+  --white: #ffffff;
+  --black: #181818;
+  --grey: #413f3f;
+  --grey-border: #353333;
+  --red: #dd1111;
+  --blue: #1a344e;
+  --blue-dark: hsl(209, 100%, 10%);
+  --blue-light: hsl(209, 100%, 30%);
+  --blue-ultra-light: hsl(209, 100%, 90%);
+
+  --text-light-mode: var(--blue);
+  --text-dark-mode: var(--white);
+
+  --color-background: var(--white);
+  --color-text: var(--blue);
+}
+
+#app {
+  background-color: var(--blue);
+  min-height: 100vh;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+nav a {
+  color: var(--blue-ultra-light);
+  text-decoration: none;
+  padding: 1rem;
+  display: block;
+  text-align: center;
+  float: left;
+}
+
+nav a:hover {
+  background-color: var(--blue-dark);
+}
+
+nav a.router-link-active {
+  font-weight: bold;
+  background-color: var(--blue-dark);
+}
+
+nav .right {
+  float: right;
+}
+
+nav .search-bar {
+  padding: 0;
+  text-align: center;
+  float: left;
+}
