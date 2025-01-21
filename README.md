@@ -39,3 +39,17 @@ npm run test:unit
 ```sh
 npm run lint
 ```
+
+# Docker Deployment (Local)
+
+A script has been created 'docker-deploy-local.sh' at the root of this project that will be used to deploy a docker container locally of this application.
+
+```sh
+./docker-deploy-local.sh
+```
+
+Upon success, you should see a container deployed like the following:
+
+![Docker-Deploy-Local](readMeImages/Docker-Deploy-Local.png)
+
+You should then be able to use the following URL to connect to the application: http://localhost:5173/
