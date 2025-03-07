@@ -3,8 +3,8 @@ CONTAINER_NAME="vue-ui-project-container"
 
 # Step 1, remove the previously build package-lock.json and node_modules
 # so that they are created before docker build process.
-# rm package-lock.json
-# rm -rf node_modules
+rm package-lock.json
+rm -rf node_modules
 
 # Step 2, reinstall the dependencies.
 npm install --include=optional --verbose

@@ -1,7 +1,7 @@
 <template>
   <div class="stock-panel">
-    <div class="panel-item">
-      <span class="value">{{ ticker }}</span>
+    <div class="panel-item ticker-item">
+      <span class="value ticker">{{ ticker }}</span>
     </div>
     <div class="panel-item">
       <span class="label">Price:</span>
@@ -65,11 +65,15 @@ export default {
 
 <style scoped>
 .stock-panel {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 5px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  padding: 20px;
   max-width: 150px;
-  background-color: #f9f9f9;
+  transition: transform 0.3s ease;
+}
+
+.stock-panel:hover {
+  transform: translateY(-5px);
 }
 
 .panel-item {
@@ -87,10 +91,20 @@ export default {
 }
 
 .positive {
-  color: green;
+  color: var(--green);
 }
 
 .negative {
-  color: red;
+  color: var(--red);
+}
+
+.ticker-item {
+  text-align: center;
+  width: 100%;
+}
+
+.ticker {
+  font-weight: bold;
+  font-size: 120%
 }
 </style>

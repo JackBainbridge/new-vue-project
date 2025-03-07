@@ -7,6 +7,12 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
+# Remove these files to avoid following error:
+# Error: Cannot find module @rollup/rollup-linux-x64-musl. 
+# npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). 
+# Please try `npm i` again after removing both package-lock.json and node_modules directory.
+RUN rm -rf node_modules package-lock.json
+
 # Install dependencies
 RUN npm install --include=optional --verbose
 

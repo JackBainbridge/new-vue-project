@@ -16,8 +16,9 @@ export function useTopGainers() {
       }
       topGainers.value = await response.json()
     } catch (err) {
-      error.value = err.message
       console.error('Error fetching top gainers:', err)
+      error.value = err.message
+      topGainers.value = []
     } finally {
       isLoading.value = false
     }
