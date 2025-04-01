@@ -13,23 +13,20 @@
         :disabled="!hasPreviousGainers"
         @click="showPreviousGainers"
       />
-      <div class="stock-panel-wrapper" style="transform: gainerTransform">
-        <TransitionGroup 
-          name="group-slide-gainers"
-          move-class="group-slide-gainers-move">
-          <StockPanel
-            v-for="(gainer, index) in visibleGainers"
-            :key="gainer.ticker + '-' + index"
-            :ticker="gainer.ticker"
-            :price="gainer.price"
-            :changeAmount="gainer.changeAmount"
-            :changePercentage="gainer.changePercentage"
-            :formatPrice="formatPrice"
-            :formatChangeAmount="formatChangeAmount"
-            :formatPercentage="formatPercentage"
-          />
-        </TransitionGroup>
-      </div>
+      <TransitionGroup :name="gainerTransitionName" name="group-slide-gainers">
+        <StockPanel
+          v-for="(gainer, index) in visibleGainers"
+          :key="gainer.ticker + '-' + index"
+          :ticker="gainer.ticker"
+          :price="gainer.price"
+          :changeAmount="gainer.changeAmount"
+          :changePercentage="gainer.changePercentage"
+          :formatPrice="formatPrice"
+          :formatChangeAmount="formatChangeAmount"
+          :formatPercentage="formatPercentage"
+          @click="navigateToStock(gainer.ticker)"
+        />
+      </TransitionGroup>
       <CircularButton 
         direction="right" 
         :disabled="!hasMoreGainers" 
@@ -52,10 +49,7 @@
         :disabled="!hasPreviousLosers"
         @click="showPreviousLosers"
       />
-      <TransitionGroup 
-        name="group-slide-losers"
-        move-class="group-slide-losers-move"
-      >
+      <TransitionGroup :name="loserTransitionName" name="group-slide-losers">
         <StockPanel
           class="stock-panel"
           v-for="(loser, index) in visibleLosers"
@@ -67,6 +61,7 @@
             :formatPrice="formatPrice"
             :formatChangeAmount="formatChangeAmount"
             :formatPercentage="formatPercentage"
+            @click="navigateToStock(loser.ticker)"
         />
       </TransitionGroup>
       <CircularButton direction="right" :disabled="!hasMoreLosers" @click="showNextLosers" />
@@ -77,10 +72,11 @@
 <script>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useTopGainers } from '@/composables/useTopGainers'
-import StockPanel from '@/components/StockPanel.vue'
+import { useTopLosers } from '@/composables/useTopLosers'
 import CircularButton from '@/components/CircularButton.vue'
+import StockPanel from '@/components/StockPanel.vue'
 import NoDataIcon from '@/components/NoDataIcon.vue'
-import { useTopLosers } from '@/composables/useTopLosers';
+import { useRouter } from 'vue-router'; // Import useRouter for navigation
 
 export default {
   components: {
@@ -94,7 +90,14 @@ export default {
     const currentGainerIndex = ref(0)
     const currentLoserIndex = ref(0)
     const panelWidth = ref(0)
+    const direction = ref('right');
     const itemsPerPage = 5
+    const router = useRouter(); // Initialize Vue Router for navigation
+    
+    // Method to navigate to stock detail view
+    const navigateToStock = (ticker) => {
+      router.push(`/stocks/${ticker}`);
+    };
 
     // GAINERS
     const visibleGainers = computed(() => {
@@ -111,15 +114,22 @@ export default {
 
     const showNextGainers = () => {
       if (hasMoreGainers.value) {
+        direction.value = 'right'
         currentGainerIndex.value += itemsPerPage
       }
     }
 
     const showPreviousGainers = () => {
       if (hasPreviousGainers.value) {
+        direction.value = 'left'
         currentGainerIndex.value -= itemsPerPage
       }
     }
+
+    // Transition name for gainer slide animation
+    const gainerTransitionName = computed(() => {
+      return direction === 'left' ? 'group-slide-gainers' : 'group-slide-gainers-left'
+    })
 
     // LOSERS
     const visibleLosers = computed(() => {
@@ -146,9 +156,10 @@ export default {
       }
     }
 
-    const gainerTransform = computed(() => {
-      return `translateX(-${currentGainerIndex.value * (100 / itemsPerPage)}%)`;
-    });
+    // Transition name for gainer slide animation
+    const loserTransitionName = computed(() => {
+      return direction.value === 'right' ? 'group-slide-losers' : 'group-slide-losers-left'
+    })
 
     // Fetch data when the component is mounted
     onMounted(async () => {
@@ -193,6 +204,20 @@ export default {
       panelWidth,
       currentGainerIndex,
       currentLoserIndex,
+      gainerTransitionName,
+      loserTransitionName,
+      navigateToStock,
+      direction,
+      itemsPerPage,
+      isLoadingGainers,
+      isLoadingLosers,
+      errorGainers,
+      errorLosers,
+      NoDataIcon,
+      CircularButton,
+      StockPanel,
+      fetchTopGainers,
+      fetchTopLosers,
     }
   },
 }
@@ -207,12 +232,12 @@ export default {
 
 /* Horizontal container for stock panels */
 .stock-panel-containers {
+  gap: 20px;
+  padding: 20px 0;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center; /* Center the content horizontally */
-  gap: 20px;
-  padding: 20px 0;
   overflow-x: hidden; /* Hide horizontal overflow */
   width: 100%; /* Ensure full width */
 }
@@ -221,18 +246,39 @@ export default {
   display: flex;
   flex-direction: row;
   gap: 20px;
-  transition: transform 0.5s ease; /* For smooth sliding effect */
+  overflow: hidden; /* Hide overflowing content */
 }
 
 .stock-panel {
   flex: 0 0 auto; /* Don't allow panels to grow or shrink */
   width: 200px; /* Set a fixed width for each panel, adjust as needed */
   box-shadow: 10px 5px 5px var(--black);
-  transition: transform 0.5s ease;
 }
 
 .stock-panel:hover {
   transform: translateY(5px);
   transform: scale(1.05);
+}
+
+/* Transition classes for slide animation */
+.group-slide-gainers-enter-active,
+.group-slide-gainers-leave-active,
+.group-slide-gainers-left-leave-active,
+.group-slide-losers-enter-active,
+.group-slide-losers-leave-active,
+.group-slide-losers-left-leave-active {
+  transition: all 0.5s ease;
+}
+
+.group-slide-losers-left-enter-from,
+.group-slide-gainers-left-enter-from {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.group-slide-losers-left-leave-to,
+.group-slide-gainers-left-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
 }
 </style>
